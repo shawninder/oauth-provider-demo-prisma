@@ -21,6 +21,10 @@ export const serverSchema = z.object({
   ),
   DISCORD_CLIENT_ID: z.string(),
   DISCORD_CLIENT_SECRET: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_DEV_TOKEN: z.string(),
+  GOOGLE_AUTH_REDIRECT: z.string(),
 });
 
 /**
@@ -35,6 +39,10 @@ export const serverEnv = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
   DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GOOGLE_DEV_TOKEN: process.env.GOOGLE_DEV_TOKEN,
+  GOOGLE_AUTH_REDIRECT: process.env.GOOGLE_AUTH_REDIRECT,
 };
 
 /**

@@ -1,6 +1,44 @@
-# Create T3 App
+# Integrating with Providers
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Allows users to log into various Ad data providers via oauth2 and aggregate data into a single dashboard.
+
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` using Prisma and Next-Auth most notably.
+
+## Get Started
+
+- clone
+- install: `npm i`
+- init DB: `npx prisma db push` (first run only)
+- Configure environments: `cp .env.example .env && cp .env.example .env.local` and edit both of those files as required.
+- launch dev env: `npm run dev`
+
+## Providers
+
+### Google and the Google Ads API
+You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Google Developer Console:
+  - GOOGLE_CLIENT_ID
+  - GOOGLE_CLIENT_SECRET
+  - GOOGLE_DEV_TOKEN (see https://developers.google.com/google-ads/api/docs/first-call/dev-token)
+  - GOOGLE_AUTH_REDIRECT (this should be http://localhost:3000/api/auth/callback/google when using an unmodified next-auth, as it is set it `.env.example`)
+
+Depending on which API endpoints you reach, you may need to add additional scopes in the provider settings in `[...nextauth].ts`
+
+Notice that I've installed `google-ads-api` from npm to help with making authenticated OAuth2 requests to the Google Ads API.
+
+#### Accounts
+The first API call demonstrated is `listAccessibleCustomers`. This returns a list of customers or client accounts which the logged in manager account can access. To access more client accounts, sub-accounts can be added via the API or via the Google Ads manager UI which is especially useful for setting up test accounts (see below).
+
+Clicking one of the returned "customers" should demonstrated a second API call which fetches a report, although this just returns `[]` for test accounts.
+
+#### Test accounts
+- Fist, [create a test manager account](https://developers.google.com/google-ads/api/docs/first-call/test-accounts).
+- Once you're logged into that account, go to Settings, Sub-account settings, and click the big "+", and then "Create a new account"
+- Fill in some details here and invite yourself with you same email, selecting a "Standard" account type.
+
+#### Links
+- [NextAuth - Google Authentications for Nextjs](https://refine.dev/blog/nextauth-google-github-authentication-nextjs/)
+- [Obtain your Developer Token](https://developers.google.com/google-ads/api/docs/first-call/dev-token)
+- [Test Accounts](https://developers.google.com/google-ads/api/docs/first-call/test-accounts)
 
 ## What's next? How do I make an app with this?
 

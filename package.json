@@ -7,7 +7,9 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "clean": "rm -rf .next",
+    "resetDB": "rm ./prisma/db.sqlite && npx prisma db push"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.5",

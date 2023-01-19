@@ -5,6 +5,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "../utils/api";
 
+const googleAdsScope = 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/adwords'
+
 const Home: NextPage = () => {
   const { status: sessionStatus, data: sessionData } = useSession();
 
@@ -13,6 +15,10 @@ const Home: NextPage = () => {
       void signIn(); // Force sign in to hopefully resolve error
     }
   }, [sessionData]);
+
+  function connectGoogleAds () {
+    void signIn('google', undefined, { scope: googleAdsScope });
+  }
 
   const [showAccessibleAdsCustomers, setShowAccessibleAdsCustomers] = useState(false); // Do we want to get the Google Ads client accounts accessible from this manager account
   const [customerIdx, setCustomerIdx] = useState(-1); // Which from the list is selected
@@ -76,6 +82,16 @@ const Home: NextPage = () => {
             <div className="flex flex-col items-center gap-2">
               <h2 className="text-white text-4xl font-bold mb-4">Google</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+                <a
+                  className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20 cursor-pointer"
+                  onClick={connectGoogleAds}
+                  target="_blank"
+                >
+                  <h3 className="text-2xl font-bold">Connect with Google Ads →</h3>
+                  <div className="text-lg">
+                    This will ask you to give this app access to your account.
+                  </div>
+                </a>
                 <a
                   className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20 cursor-pointer"
                   onClick={listAccessibleCustomers}

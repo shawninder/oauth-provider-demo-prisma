@@ -11,4 +11,8 @@ declare module "next-auth" {
     accessToken?: string | null;
     error?: string
   }
+
+  interface Profile {
+    email_verified?: boolean
+  }
 }

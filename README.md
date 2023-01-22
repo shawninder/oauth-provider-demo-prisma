@@ -14,6 +14,8 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
 ## Providers
 
+**Warning:** You'll notice I'm using `allowDangerousEmailAccountLinking: true` on the Google and Facebook providers. This is safer than the name suggests because these providers verify emails before allow OAuth login. For providers where this isn't the case, e-mail verification will have to be implemented manually in a way than prevents any opportunity for account hijacking. Similarly, if you want to support account linking for accounts using different email addresses, that would have to be implemented manually as well.
+
 ### Google and the Google Ads API
 You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Google Developer Console:
   - GOOGLE_CLIENT_ID
@@ -39,6 +41,20 @@ Clicking one of the returned "customers" should demonstrated a second API call w
 - [NextAuth - Google Authentications for Nextjs](https://refine.dev/blog/nextauth-google-github-authentication-nextjs/)
 - [Obtain your Developer Token](https://developers.google.com/google-ads/api/docs/first-call/dev-token)
 - [Test Accounts](https://developers.google.com/google-ads/api/docs/first-call/test-accounts)
+
+### Facebook and the Facebook Marketing API
+You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Facebook Developers Console:
+  - FACEBOOK_CLIENT_ID
+  - FACEBOOK_CLIENT_SECRET
+
+For the login to work, you'll have to set up Facebook Login (which is different than Facebook Login for Businesses) and provide a valid URL for your app's privacy policy (although I just used GitHub's privacy policy page for testing purposes and that seems to work for now…).
+
+According to [the docs](https://developers.facebook.com/docs/marketing-api/overview/authorization/), to access the Marketing API, you need to create a Business App (as opposed to a gaming app or any other [app type](https://developers.facebook.com/docs/development/create-an-app/app-dashboard/app-types)).
+
+Depending on which API endpoints you reach, you may need to add additional scopes in the provider settings in `[...nextauth].ts
+
+#### Links
+- [Marketing API Authorization](https://developers.facebook.com/docs/marketing-api/overview/authorization/)
 
 ## What's next? How do I make an app with this?
 

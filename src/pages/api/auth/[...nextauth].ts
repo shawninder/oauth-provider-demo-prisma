@@ -1,6 +1,7 @@
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
@@ -10,7 +11,11 @@ import { prisma } from "../../../server/db";
 export const authOptions: NextAuthOptions = {
   // Include user.id and account.access_token on session
   callbacks: {
-    async signIn ({ user, account }) {
+    async signIn ({ user, account, profile }) {
+      if (account?.provider === 'google' && profile?.email_verified === false) {
+        console.error("Cannot log in with Google using unverified email");
+        return false;
+      }
       if (user) {
         try {
           const dbUser = await prisma.user.findFirst({
@@ -74,7 +79,13 @@ export const authOptions: NextAuthOptions = {
         params: {
           scope: 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile'
         }
-      }
+      },
+      allowDangerousEmailAccountLinking: true
+    }),
+    FacebookProvider({
+      clientId: env.FACEBOOK_CLIENT_ID,
+      clientSecret: env.FACEBOOK_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true
     }),
     /**
      * ...add more providers here

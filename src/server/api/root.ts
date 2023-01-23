@@ -1,5 +1,6 @@
 import { createTRPCRouter } from "./trpc";
 import { googleRouter } from "./routers/google";
+import { facebookRouter } from "./routers/facebook";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { googleRouter } from "./routers/google";
  */
 export const appRouter = createTRPCRouter({
   google: googleRouter,
+  facebook: facebookRouter,
 });
 
 // export type definition of API

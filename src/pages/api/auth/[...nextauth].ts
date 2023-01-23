@@ -48,18 +48,24 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async session ({ session, user }) {
+      if (!session.accessTokens) {
+        session.accessTokens = {}
+      }
       if (session.user) {
         session.user.id = user.id;
       }
-      const account = await prisma.account.findFirst({
+      const accounts = await prisma.account.findMany({
         where: {
           userId: user.id,
         },
       });
 
-      if (account) {
-        const accessToken = account.access_token;
-        session.accessToken = accessToken;
+      if (accounts && accounts.length > 0) {
+        accounts.forEach((account) => {
+          if (account.provider) {
+            session.accessTokens[account?.provider] = account.access_token || '';
+          }
+        })
       }
 
       return session;

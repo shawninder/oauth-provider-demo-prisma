@@ -49,12 +49,15 @@ You will need to add the following values to your environment variables via .env
 
 For the login to work, you'll have to set up Facebook Login (which is different than Facebook Login for Businesses) and provide a valid URL for your app's privacy policy (although I just used GitHub's privacy policy page for testing purposes and that seems to work for now…).
 
-According to [the docs](https://developers.facebook.com/docs/marketing-api/overview/authorization/), to access the Marketing API, you need to create a Business App (as opposed to a gaming app or any other [app type](https://developers.facebook.com/docs/development/create-an-app/app-dashboard/app-types)).
+You'll also need to add `localhost` to your app's domains for it to work with local testing, as well as select a category and upload an app icon.
 
-Depending on which API endpoints you reach, you may need to add additional scopes in the provider settings in `[...nextauth].ts
+You can test this with real-world accounts or make test accounts from your Facebook App's dashboard under Add Roles. Unfortunately, things simply don't work when using test accounts and instead Facebook fails saying it can't load the URL and advising the domain be added in the account settings despite it being there already.
+
+According to [the docs](https://developers.facebook.com/docs/marketing-api/overview/authorization/), to access the Marketing API, you need to create a Business App (as opposed to a gaming app or any other [app type](https://developers.facebook.com/docs/development/create-an-app/app-dashboard/app-types)).
 
 #### Links
 - [Marketing API Authorization](https://developers.facebook.com/docs/marketing-api/overview/authorization/)
+- [Facebook API Tutorial: Graph API, Access Token, and Developer Documentation Exaplained](https://www.kitchn.io/blog/intro-facebook-marketing-api)
 
 ## What's next? How do I make an app with this?
 

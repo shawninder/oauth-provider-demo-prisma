@@ -16,14 +16,14 @@ const onQueryError: OnQueryError = ({ error }) => {
 
 export const googleRouter = createTRPCRouter({
   listAccessibleAdsCustomers: protectedProcedure.query(({ ctx }) => {
-    return googleAdsAPIClient.listAccessibleCustomers(ctx.session.accessToken || '');
+    return googleAdsAPIClient.listAccessibleCustomers(ctx.session.accessTokens?.google || '');
   }),
   getCustomer: protectedProcedure.input(
     z.string()
   ).query(({ ctx, input: customer_id }) => {
     const customer = googleAdsAPIClient.Customer({
       customer_id,
-      refresh_token: ctx.session.accessToken || '',
+      refresh_token: ctx.session.accessTokens?.google || '',
     }, {
       onQueryError,
     });
@@ -35,7 +35,7 @@ export const googleRouter = createTRPCRouter({
     try {
       const customer = googleAdsAPIClient.Customer({
         customer_id,
-        refresh_token: ctx.session.accessToken || '',
+        refresh_token: ctx.session.accessTokens?.google || '',
       }, {
         onQueryError,
       });

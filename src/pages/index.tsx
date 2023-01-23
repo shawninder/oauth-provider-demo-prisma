@@ -6,6 +6,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { api } from "../utils/api";
 
 const googleAdsScope = 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/adwords'
+const facebookAdsScope = 'ads_read ads_management'
 
 const Home: NextPage = () => {
   const { status: sessionStatus, data: sessionData } = useSession();
@@ -54,13 +55,62 @@ const Home: NextPage = () => {
   const {
     data: report,
     isLoading: isReportLoading,
-    error: reportError
+    error: reportError,
   } = api.google.getReport.useQuery(
     customerId,
     { enabled: customerStatus === 'truthy', refetchOnWindowFocus: false },
-  )
+  );
 
   const reportStatus = isReportLoading ? 'Loading' : reportError ? 'error' : !!report ? 'truthy' : 'falsy' // Label
+
+  function connectFacebookAds () {
+    void signIn('facebook', undefined, { scope: facebookAdsScope });
+  }
+
+  const [showFacebookAdAccounts, setShowFacebookAdAccounts] = useState(false);
+
+  function callFacebookApi () {
+    setShowFacebookAdAccounts((prev) => !prev)
+  }
+
+  const {
+    data: fbAdAccounts,
+    isLoading: isFbAdAccountsLoading,
+    error: fbAdAccountsError,
+  } = api.facebook.getAdAccounts.useQuery(
+    undefined,
+    { enabled: showFacebookAdAccounts, refetchOnWindowFocus: false },
+  );
+  const parsedFbAdAccounts = fbAdAccounts ? JSON.parse(fbAdAccounts as string) as {
+    data: [{
+      id: string,
+      name: string
+    }],
+    paging?: {
+      cursors: {
+        before: string,
+        after: string
+      }
+    }
+  } : {
+    data: []
+  };
+
+  const fbAdAccountStatus = isFbAdAccountsLoading ? 'Loading' : fbAdAccountsError ? 'error' : !!fbAdAccounts ? 'truthy' : 'falsy' // Label
+
+  const [fbAdAccountIdx, setFbAdAccountIdx] = useState(-1); // Which from the list is selected
+
+  const fbAdAccountId = parsedFbAdAccounts.data?.[fbAdAccountIdx]?.id || ''
+  const {
+    data: fbReport,
+    isLoading: isFbReportLoading,
+    error: fbReportError,
+  } = api.facebook.getReport.useQuery(
+    fbAdAccountId,
+    { enabled: fbAdAccountIdx !== -1, refetchOnWindowFocus: false },
+  );
+
+  const fbReportStatus = isFbReportLoading ? 'Loading' : fbReportError ? 'error' : !!fbReport ? 'truthy' : 'falsy' // Label
 
   return (
     <>
@@ -138,6 +188,56 @@ const Home: NextPage = () => {
                     <div className="text-lg">
                       <p>{reportError?.toString()}</p>
                       <pre>{JSON.stringify(report, null, 2)}</pre>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <h2 className="text-white text-4xl font-bold mb-4">Facebook</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+                <a
+                  className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20 cursor-pointer"
+                  onClick={connectFacebookAds}
+                  target="_blank"
+                >
+                  <h3 className="text-2xl font-bold">Connect with Facebook Marketing API →</h3>
+                  <div className="text-lg">
+                    This will ask you to give this app access to your account.
+                  </div>
+                </a>
+                <a
+                  className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20 cursor-pointer"
+                  onClick={callFacebookApi}
+                  target="_blank"
+                >
+                  <h3 className="text-2xl font-bold">Call Facebook API →</h3>
+                  <div className="text-lg">
+                    This demonstrates calling the API by fetching the ad campaigns for the logged-in user.
+                  </div>
+                </a>
+                {showFacebookAdAccounts ? (
+                  <div className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
+                    <h3 className="text-2xl font-bold">Report → {fbAdAccountStatus}</h3>
+                    <div className="text-lg">
+                      <p>{fbAdAccountsError?.toString()}</p>
+                      <pre>{JSON.stringify(parsedFbAdAccounts, null, 2)}</pre>
+                      <ul>{parsedFbAdAccounts.data.map(({ id, name }, idx) => {
+                        return (
+                          <li key={id} className={idx === fbAdAccountIdx ? 'text-red' : ''}>
+                            <a className="underline cursor-pointer" onClick={() => {
+                                idx === fbAdAccountIdx ? setFbAdAccountIdx(-1) : setFbAdAccountIdx(idx)
+                              }}>{name} ({id})</a>
+                            </li>
+                        )
+                      })}</ul>
+                    </div>
+                  </div>
+                ) : null}
+                {fbAdAccountIdx !== -1 ? (
+                  <div className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
+                    <h3 className="text-2xl font-bold">Ad Account → {fbReportStatus}</h3>
+                    <div className="text-lg">
+                      <p>{fbReportError?.toString()}</p>
+                      <pre>{JSON.stringify(fbReport, null, 2)}</pre>
                     </div>
                   </div>
                 ) : null}

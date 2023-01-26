@@ -4,6 +4,10 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 import { enums, GoogleAdsApi, type OnQueryError } from "google-ads-api";
 
+import getAccessTokenForProvider from '../../../utils/getAccessTokenForProvider';
+
+const getAccessToken = getAccessTokenForProvider('google');
+
 const googleAdsAPIClient = new GoogleAdsApi({
   client_id: process.env.GOOGLE_CLIENT_ID || '',
   client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -11,19 +15,21 @@ const googleAdsAPIClient = new GoogleAdsApi({
 });
 
 const onQueryError: OnQueryError = ({ error }) => {
-  console.error('Query error', error)
+  console.error('Query error', error);
 }
 
+
+
 export const googleRouter = createTRPCRouter({
-  listAccessibleAdsCustomers: protectedProcedure.query(({ ctx }) => {
-    return googleAdsAPIClient.listAccessibleCustomers(ctx.session.accessTokens?.google || '');
+  listAccessibleAdsCustomers: protectedProcedure.query(async ({ ctx }) => {
+    return googleAdsAPIClient.listAccessibleCustomers(await getAccessToken(ctx));
   }),
   getCustomer: protectedProcedure.input(
     z.string()
-  ).query(({ ctx, input: customer_id }) => {
+  ).query(async ({ ctx, input: customer_id }) => {
     const customer = googleAdsAPIClient.Customer({
       customer_id,
-      refresh_token: ctx.session.accessTokens?.google || '',
+      refresh_token: await getAccessToken(ctx),
     }, {
       onQueryError,
     });
@@ -35,7 +41,7 @@ export const googleRouter = createTRPCRouter({
     try {
       const customer = googleAdsAPIClient.Customer({
         customer_id,
-        refresh_token: ctx.session.accessTokens?.google || '',
+        refresh_token: await getAccessToken(ctx),
       }, {
         onQueryError,
       });

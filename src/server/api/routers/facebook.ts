@@ -3,6 +3,10 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
+import getAccessTokenForProvider from '../../../utils/getAccessTokenForProvider';
+
+const getAccessToken = getAccessTokenForProvider('facebook');
+
 const apiBaseUrl = 'https://graph.facebook.com/v15.0/'
 
 export const facebookRouter = createTRPCRouter({
@@ -11,7 +15,7 @@ export const facebookRouter = createTRPCRouter({
       const queryUrl = 'me/adaccounts'
       const searchParams = new URLSearchParams({
         fields: 'id,name',
-        access_token: ctx.session.accessTokens?.facebook || ''
+        access_token: await getAccessToken(ctx)
       })
       const url = new URL(`${queryUrl}?${searchParams.toString()}`, apiBaseUrl)
 
@@ -30,7 +34,7 @@ export const facebookRouter = createTRPCRouter({
       const queryUrl = `${adAccountId}/campaigns`
       const searchParams = new URLSearchParams({
         fields: 'id,name,daily_budget',
-        access_token: ctx.session.accessTokens?.facebook || ''
+        access_token: await getAccessToken(ctx)
       })
       const url = new URL(`${queryUrl}?${searchParams.toString()}`, apiBaseUrl)
 

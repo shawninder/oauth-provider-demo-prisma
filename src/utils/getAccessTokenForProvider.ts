@@ -18,6 +18,7 @@ export type RefreshError = {
   error: string
 }
 
+// One refreshAccessToken functions for each provider
 const refreshAccessTokenForProvider = {
   google: refreshGoogleAccessToken,
   facebook: refreshFacebookAccessToken,
@@ -33,8 +34,10 @@ export default function getAccessTokenForProvider (provider: KnownProvider) {
   return async function getAccessToken (ctx: Ctx): Promise<string> {
     const dbAccount = await ctx.prisma.account.findFirst({
       where: {
-        userId: ctx.session?.user?.id, // Filter by user
-        provider // and provider
+        // Filter by user
+        userId: ctx.session?.user?.id,
+        // and provider
+        provider
       }
     });
 
@@ -54,12 +57,14 @@ export default function getAccessTokenForProvider (provider: KnownProvider) {
       return refreshAccessToken(ctx, dbAccount);
     }
 
-    return accessToken; // Return the access token for this user–provider pair, if found
+    // No need to refresh token, return existing token
+    return accessToken;
   }
 }
 
 export async function refreshGoogleAccessToken (ctx: Ctx, dbAccount: Account): Promise<string> {
   try {
+    // See https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code
     const url =
       `https://oauth2.googleapis.com/token?${(new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID || '',
@@ -83,6 +88,7 @@ export async function refreshGoogleAccessToken (ctx: Ctx, dbAccount: Account): P
 
     const data = responseData as RefreshedTokens;
 
+    // Update database with refreshed token
     await ctx.prisma.account.update({
       where: {
         id: dbAccount.id
@@ -102,6 +108,7 @@ export async function refreshGoogleAccessToken (ctx: Ctx, dbAccount: Account): P
 
 export async function refreshFacebookAccessToken (ctx: Ctx, dbAccount: Account): Promise<string> {
   try {
+    // See https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-long-lived
     const url =
       `https://graph.facebook.com/v15.0/oauth/access_token?${(new URLSearchParams({
         grant_type: 'fb_exchange_token',
@@ -125,6 +132,7 @@ export async function refreshFacebookAccessToken (ctx: Ctx, dbAccount: Account):
 
     const data = responseData as RefreshedTokens;
 
+    // Update database with refreshed token
     await ctx.prisma.account.update({
       where: {
         id: dbAccount.id

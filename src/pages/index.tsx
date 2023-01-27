@@ -1,116 +1,52 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-import { api } from "../utils/api";
-
-const googleAdsScope = 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/adwords'
-const facebookAdsScope = 'ads_read ads_management'
+import useGoogleAds from '../utils/hooks/useGoogleAds';
+import useFacebookAds from '../utils/hooks/useFacebookAds';
 
 const Home: NextPage = () => {
+  // Get a session object from Next-Auth
   const { status: sessionStatus, data: sessionData } = useSession();
 
+  // When the session data changes
   useEffect(() => {
+    // Check for recuperable errors
     if (sessionData?.error === "RefreshAccessTokenError") {
       void signIn(); // Force sign in to hopefully resolve error
     }
   }, [sessionData]);
 
-  function connectGoogleAds () {
-    void signIn('google', undefined, { scope: googleAdsScope });
-  }
-
-  const [showAccessibleAdsCustomers, setShowAccessibleAdsCustomers] = useState(false); // Do we want to get the Google Ads client accounts accessible from this manager account
-  const [customerIdx, setCustomerIdx] = useState(-1); // Which from the list is selected
+  const {
+    connectGoogleAds,
+    showAccessibleAdsCustomers,
+    listAccessibleCustomers,
+    accessibleAdsCustomers,
+    accessibleAdsCustomersStatus,
+    customerIdx,
+    setCustomerIdx,
+    customerListError,
+    customer,
+    customerStatus,
+    report,
+    reportError,
+    reportStatus,
+  } = useGoogleAds();
 
   const {
-    data: accessibleAdsCustomers,
-    isLoading: isCustomerListLoading,
-    error: customerListError
-  } = api.google.listAccessibleAdsCustomers.useQuery(
-    undefined, // no input
-    { enabled: sessionStatus === 'authenticated' && showAccessibleAdsCustomers, refetchOnWindowFocus: false },
-  );
-
-  const accessibleAdsCustomersStatus = isCustomerListLoading ? 'Loading' : customerListError ? 'error' : accessibleAdsCustomers ? 'truthy' : 'falsy'
-
-  function listAccessibleCustomers () {
-    setShowAccessibleAdsCustomers(true);
-  }
-
-  const customerId = (accessibleAdsCustomers?.resource_names[customerIdx] || '')?.replace('customers/', '') // Extracting the numeric ID
-
-  const {
-    data: customer,
-    isLoading: isCustomerLoading,
-    error: customerError
-  } = api.google.getCustomer.useQuery(
-    customerId,
-    { enabled: customerIdx !== -1, refetchOnWindowFocus: false },
-  )
-
-  const customerStatus = isCustomerLoading ? 'Loading' : customerError ? 'error' : !!customer ? 'truthy' : 'falsy' // Label
-
-  const {
-    data: report,
-    isLoading: isReportLoading,
-    error: reportError,
-  } = api.google.getReport.useQuery(
-    customerId,
-    { enabled: customerStatus === 'truthy', refetchOnWindowFocus: false },
-  );
-
-  const reportStatus = isReportLoading ? 'Loading' : reportError ? 'error' : !!report ? 'truthy' : 'falsy' // Label
-
-  function connectFacebookAds () {
-    void signIn('facebook', undefined, { scope: facebookAdsScope });
-  }
-
-  const [showFacebookAdAccounts, setShowFacebookAdAccounts] = useState(false);
-
-  function callFacebookApi () {
-    setShowFacebookAdAccounts((prev) => !prev)
-  }
-
-  const {
-    data: fbAdAccounts,
-    isLoading: isFbAdAccountsLoading,
-    error: fbAdAccountsError,
-  } = api.facebook.getAdAccounts.useQuery(
-    undefined,
-    { enabled: showFacebookAdAccounts, refetchOnWindowFocus: false },
-  );
-  const parsedFbAdAccounts = fbAdAccounts ? JSON.parse(fbAdAccounts as string) as {
-    data: [{
-      id: string,
-      name: string
-    }],
-    paging?: {
-      cursors: {
-        before: string,
-        after: string
-      }
-    }
-  } : {
-    data: []
-  };
-
-  const fbAdAccountStatus = isFbAdAccountsLoading ? 'Loading' : fbAdAccountsError ? 'error' : !!fbAdAccounts ? 'truthy' : 'falsy' // Label
-
-  const [fbAdAccountIdx, setFbAdAccountIdx] = useState(-1); // Which from the list is selected
-
-  const fbAdAccountId = parsedFbAdAccounts.data?.[fbAdAccountIdx]?.id || ''
-  const {
-    data: fbReport,
-    isLoading: isFbReportLoading,
-    error: fbReportError,
-  } = api.facebook.getReport.useQuery(
-    fbAdAccountId,
-    { enabled: fbAdAccountIdx !== -1, refetchOnWindowFocus: false },
-  );
-
-  const fbReportStatus = isFbReportLoading ? 'Loading' : fbReportError ? 'error' : !!fbReport ? 'truthy' : 'falsy' // Label
+    connectFacebookAds,
+    showFacebookAdAccounts,
+    callFacebookApi,
+    parsedFbAdAccounts,
+    fbAdAccountsError,
+    fbAdAccountStatus,
+    fbAdAccountIdx,
+    setFbAdAccountIdx,
+    fbReport,
+    fbReportError,
+    fbReportStatus,
+  } = useFacebookAds();
 
   return (
     <>
@@ -186,7 +122,7 @@ const Home: NextPage = () => {
                   <div className="flex flex-col gap-4 rounded-xl bg-white/10 p-4 text-white">
                     <h3 className="text-2xl font-bold">Customer Report → {reportStatus}</h3>
                     <div className="text-lg">
-                      <p>{reportError?.toString()}</p>
+                      <p>{(reportError as object)?.toString()}</p>
                       <pre>{JSON.stringify(report, null, 2)}</pre>
                     </div>
                   </div>

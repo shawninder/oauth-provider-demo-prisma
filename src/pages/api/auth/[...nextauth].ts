@@ -9,14 +9,15 @@ import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
 
 export const authOptions: NextAuthOptions = {
-  // Include user.id and account.access_token on session
   callbacks: {
     async signIn ({ user, account, profile }) {
+      // Refuse logging in via Google for accounts with an unverified email
       if (account?.provider === 'google' && profile?.email_verified === false) {
         console.error("Cannot log in with Google using unverified email");
         return false;
       }
       if (user) {
+        // When signing in an existing user, save the access token in their account
         try {
           const dbUser = await prisma.user.findFirst({
             where: {
@@ -47,6 +48,7 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
+    // Include user.id on session
     session ({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
@@ -70,12 +72,12 @@ export const authOptions: NextAuthOptions = {
           scope: 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile'
         }
       },
-      allowDangerousEmailAccountLinking: true
+      allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
     }),
     FacebookProvider({
       clientId: env.FACEBOOK_CLIENT_ID,
       clientSecret: env.FACEBOOK_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true
+      allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
     }),
     /**
      * ...add more providers here

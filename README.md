@@ -12,6 +12,13 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 - Configure environments: `cp .env.example .env && cp .env.example .env.local` and edit both of those files as required.
 - launch dev env: `npm run dev`
 
+## About Next-Auth
+
+### Links
+
+- https://next-auth.js.org/providers
+- https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
+
 ## Providers
 
 **Warning:** You'll notice I'm using `allowDangerousEmailAccountLinking: true` on the Google and Facebook providers. This is safer than the name suggests because these providers verify emails before allow OAuth login. For providers where this isn't the case, e-mail verification will have to be implemented manually in a way than prevents any opportunity for account hijacking. Similarly, if you want to support account linking for accounts using different email addresses, that would have to be implemented manually as well.
@@ -41,6 +48,7 @@ Clicking one of the returned "customers" should demonstrated a second API call w
 - [NextAuth - Google Authentications for Nextjs](https://refine.dev/blog/nextauth-google-github-authentication-nextjs/)
 - [Obtain your Developer Token](https://developers.google.com/google-ads/api/docs/first-call/dev-token)
 - [Test Accounts](https://developers.google.com/google-ads/api/docs/first-call/test-accounts)
+- [Refreshing tokens](https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code)
 
 ### Facebook and the Facebook Marketing API
 You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Facebook Developers Console:
@@ -57,7 +65,9 @@ According to [the docs](https://developers.facebook.com/docs/marketing-api/overv
 
 #### Links
 - [Marketing API Authorization](https://developers.facebook.com/docs/marketing-api/overview/authorization/)
+- [Facebook Graph API](https://developers.facebook.com/docs/graph-api/)
 - [Facebook API Tutorial: Graph API, Access Token, and Developer Documentation Exaplained](https://www.kitchn.io/blog/intro-facebook-marketing-api)
+- [Refreshing tokens](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/get-long-lived)
 
 ## What's next? How do I make an app with this?
 

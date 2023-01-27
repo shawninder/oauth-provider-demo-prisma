@@ -1,9 +1,10 @@
-import https from 'https'
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 import getAccessTokenForProvider from '../../../utils/getAccessTokenForProvider';
+
+import get from '../../../utils/get';
 
 // Getting an access token getter for facebook
 const getAccessToken = getAccessTokenForProvider('facebook');
@@ -60,20 +61,3 @@ export const facebookRouter = createTRPCRouter({
     }
   }),
 });
-
-// Helper function to perform GET requests over https
-function get (url: URL): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, (res) => {
-      let output = '';
-      res.on('data', (chunk) => {
-        output += chunk;
-      });
-      res.on('end', () => {
-        return resolve(output);
-      });
-    });
-    req.on('error', reject);
-    req.end();
-  });
-}

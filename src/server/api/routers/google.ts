@@ -6,6 +6,8 @@ import { enums, GoogleAdsApi, type OnQueryError } from "google-ads-api";
 
 import getAccessTokenForProvider from '../../../utils/getAccessTokenForProvider';
 
+import get from '../../../utils/get';
+
 // Getting an access token getter for google
 const getAccessToken = getAccessTokenForProvider('google');
 
@@ -21,7 +23,12 @@ const onQueryError: OnQueryError = ({ error }) => {
   console.error('Query error', error);
 }
 
+const googleAnalyticsBaseURL = 'https://www.googleapis.com'
+
 export const googleRouter = createTRPCRouter({
+
+  // GOOGLE ADS
+
   // Set up a route for listing accessible Ads customer
   listAccessibleAdsCustomers: protectedProcedure.query(async ({ ctx }) => {
     return googleAdsAPIClient.listAccessibleCustomers(await getAccessToken(ctx));
@@ -79,4 +86,50 @@ export const googleRouter = createTRPCRouter({
       return ex
     }
   }),
+
+  // GOOGLE ANALYTICS
+
+  listAnalyticsAccounts: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      // Reaching the accounts endpoint of the Google Analytics Management API
+      const queryUrl = 'analytics/v3/management/accounts'
+      const searchParams = new URLSearchParams({
+        // Access token authorizing the request
+        access_token: await getAccessToken(ctx)
+      })
+      // Final URL for the request
+      const url = new URL(`${queryUrl}?${searchParams.toString()}`, googleAnalyticsBaseURL)
+
+      // Perform the request
+      const response = await get(url)
+
+      return response
+    } catch (ex) {
+      console.error(ex);
+      return ex;
+    }
+  }),
+
+  listWebProperties: protectedProcedure.input(
+    z.string() // The front-end will be sending the ID of the account we want
+  ).query(async ({ ctx, input: accountId }) => {
+    try {
+      // Reaching the accounts endpoint of the Google Analytics Management API
+      const queryUrl = `analytics/v3/management/accounts/${accountId}/webproperties`
+      const searchParams = new URLSearchParams({
+        // Access token authorizing the request
+        access_token: await getAccessToken(ctx)
+      })
+      // Final URL for the request
+      const url = new URL(`${queryUrl}?${searchParams.toString()}`, googleAnalyticsBaseURL)
+
+      // Perform the request
+      const response = await get(url)
+
+      return response
+    } catch (ex) {
+      console.error(ex);
+      return ex;
+    }
+  })
 });

@@ -9,7 +9,11 @@ import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
 
 export const authOptions: NextAuthOptions = {
+  // See https://next-auth.js.org/configuration/options#callbacks
   callbacks: {
+    // This callback is called whenever a signIn happens
+    // Return `false` to refuse signIn, `true` to authorize
+    // see https://next-auth.js.org/configuration/callbacks#sign-in-callback
     async signIn ({ user, account, profile }) {
       // Refuse logging in via Google for accounts with an unverified email
       if (account?.provider === 'google' && profile?.email_verified === false) {
@@ -38,7 +42,7 @@ export const authOptions: NextAuthOptions = {
                 id_token: account?.id_token,
                 refresh_token: account?.refresh_token,
                 session_state: account?.session_state,
-                scope: account?.scope
+                scope: account?.scope || ''
               }
             });
           }
@@ -48,7 +52,8 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    // Include user.id on session
+    // The session callback is called whenever a session is checked
+    // See https://next-auth.js.org/configuration/callbacks#session-callback
     session ({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
@@ -57,8 +62,11 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  // Configure one or more authentication providers
+  // Choose a database adapter
+  // See https://next-auth.js.org/adapters/overview and https://next-auth.js.org/configuration/options#adapter
   adapter: PrismaAdapter(prisma),
+  // Configure one or more authentication providers
+  // See https://next-auth.js.org/providers/ and https://next-auth.js.org/configuration/options#providers
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,

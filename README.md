@@ -23,7 +23,7 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
 **Warning:** You'll notice I'm using `allowDangerousEmailAccountLinking: true` on the Google and Facebook providers. This is safer than the name suggests because these providers verify emails before allow OAuth login. For providers where this isn't the case, e-mail verification will have to be implemented manually in a way than prevents any opportunity for account hijacking. Similarly, if you want to support account linking for accounts using different email addresses, that would have to be implemented manually as well.
 
-### Google and the Google Ads API
+### Google, Google Ads, Google Analytics
 You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Google Developer Console:
   - GOOGLE_CLIENT_ID
   - GOOGLE_CLIENT_SECRET
@@ -33,6 +33,8 @@ You will need to add the following values to your environment variables via .env
 Depending on which API endpoints you reach, you may need to add additional scopes in the provider settings in `[...nextauth].ts`
 
 Notice that I've installed `google-ads-api` from npm to help with making authenticated OAuth2 requests to the Google Ads API.
+
+You'll also need to enable the Google Analytics API from the Google developer console dashboard for the account from which the Developer Token was obtained.
 
 #### Accounts
 The first API call demonstrated is `listAccessibleCustomers`. This returns a list of customers or client accounts which the logged in manager account can access. To access more client accounts, sub-accounts can be added via the API or via the Google Ads manager UI which is especially useful for setting up test accounts (see below).

@@ -69,7 +69,8 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       authorization: {
         params: {
-          scope: 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile'
+          scope: 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile',
+          access_type: 'offline'
         }
       },
       allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option

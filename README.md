@@ -49,6 +49,7 @@ Clicking one of the returned "customers" should demonstrated a second API call w
 - [Obtain your Developer Token](https://developers.google.com/google-ads/api/docs/first-call/dev-token)
 - [Test Accounts](https://developers.google.com/google-ads/api/docs/first-call/test-accounts)
 - [Refreshing tokens](https://developers.google.com/identity/protocols/oauth2/web-server#exchange-authorization-code)
+- [Not Receiving Google OAuth refresh token](https://stackoverflow.com/questions/10827920/not-receiving-google-oauth-refresh-token)
 
 ### Facebook and the Facebook Marketing API
 You will need to add the following values to your environment variables via .env and/or .env.local, all of which you can get / set up in the Facebook Developers Console:

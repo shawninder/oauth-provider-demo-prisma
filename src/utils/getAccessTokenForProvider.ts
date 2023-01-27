@@ -70,7 +70,7 @@ export async function refreshGoogleAccessToken (ctx: Ctx, dbAccount: Account): P
         client_id: process.env.GOOGLE_CLIENT_ID || '',
         client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
         grant_type: 'refresh_token',
-        refresh_token: dbAccount.access_token || ''
+        refresh_token: dbAccount.refresh_token || ''
       })).toString()}`
 
     const response = await fetch(url, {
@@ -145,7 +145,7 @@ export async function refreshFacebookAccessToken (ctx: Ctx, dbAccount: Account):
 
     return data.access_token;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw new Error("RefreshGoogleAccessTokenError");
   }
 }

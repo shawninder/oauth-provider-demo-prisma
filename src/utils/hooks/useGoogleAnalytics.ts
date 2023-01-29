@@ -21,7 +21,7 @@ export default function useGoogleAnalytics () {
   // Call this function to request an access token
   // with Google Analytics permission scopes
   function connectGoogleAnalytics () {
-    void signIn('google', undefined, { scope: googleAnalyticsScope });
+    void signIn('googleAnalytics', undefined, { scope: googleAnalyticsScope });
   }
 
   // Do we want to show the list of accessible analytics accounts?

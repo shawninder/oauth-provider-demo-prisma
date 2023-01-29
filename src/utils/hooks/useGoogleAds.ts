@@ -12,7 +12,7 @@ export default function useGoogleAds () {
   // Call this function to request an access token
   // with Google Ads permission scopes
   function connectGoogleAds () {
-    void signIn('google', undefined, { scope: googleAdsScope });
+    void signIn('googleAds', undefined, { scope: googleAdsScope });
   }
 
   // Do we want to show the list of accessible ads customers for this manager account?

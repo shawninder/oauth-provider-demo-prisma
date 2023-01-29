@@ -6,7 +6,7 @@ export type Ctx = {
   session: Session | null;
 };
 
-export type KnownProvider = 'google' | 'facebook';
+export type KnownProvider = 'google' | 'googleAnalytics' | 'googleAds' | 'facebook';
 
 export type RefreshedTokens = {
   ok: boolean
@@ -21,6 +21,8 @@ export type RefreshError = {
 // One refreshAccessToken functions for each provider
 const refreshAccessTokenForProvider = {
   google: refreshGoogleAccessToken,
+  googleAds: refreshGoogleAccessToken,
+  googleAnalytics: refreshGoogleAccessToken,
   facebook: refreshFacebookAccessToken,
 }
 
@@ -37,19 +39,18 @@ export default function getAccessTokenForProvider (provider: KnownProvider) {
         // Filter by user
         userId: ctx.session?.user?.id,
         // and provider
-        provider
+        provider,
       }
     });
 
     if (!dbAccount) {
-      throw new Error("Cannot get access token, account not found for this provider")
+      throw new Error("Cannot get access token, account not found for this provider");
     }
-
-    const accessToken = dbAccount.access_token
-    const expiresAt = dbAccount.expires_at
+    const accessToken = dbAccount.access_token;
+    const expiresAt = dbAccount.expires_at;
 
     if (!accessToken || !expiresAt) {
-      throw new Error("Cannot get access token, account doesn't have one…")
+      throw new Error("Cannot get access token, account doesn't have one…");
     }
 
     if (expiresAt < Date.now() / 1000) {

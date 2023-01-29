@@ -9,7 +9,8 @@ import getAccessTokenForProvider from '../../../utils/getAccessTokenForProvider'
 import get from '../../../utils/get';
 
 // Getting an access token getter for google
-const getAccessToken = getAccessTokenForProvider('google');
+const getAnalyticsAccessToken = getAccessTokenForProvider('googleAnalytics');
+const getAdsAccessToken = getAccessTokenForProvider('googleAds');
 
 // Configure Google Ads API client
 const googleAdsAPIClient = new GoogleAdsApi({
@@ -31,7 +32,7 @@ export const googleRouter = createTRPCRouter({
 
   // Set up a route for listing accessible Ads customer
   listAccessibleAdsCustomers: protectedProcedure.query(async ({ ctx }) => {
-    return googleAdsAPIClient.listAccessibleCustomers(await getAccessToken(ctx));
+    return googleAdsAPIClient.listAccessibleCustomers(await getAdsAccessToken(ctx));
   }),
   // Set up a route for creating a Customer instance with the client
   getCustomer: protectedProcedure.input(
@@ -39,7 +40,7 @@ export const googleRouter = createTRPCRouter({
   ).query(async ({ ctx, input: customer_id }) => {
     const customer = googleAdsAPIClient.Customer({
       customer_id,
-      refresh_token: await getAccessToken(ctx),
+      refresh_token: await getAdsAccessToken(ctx),
     }, {
       onQueryError,
     });
@@ -53,7 +54,7 @@ export const googleRouter = createTRPCRouter({
       // Create a Customer instance
       const customer = googleAdsAPIClient.Customer({
         customer_id,
-        refresh_token: await getAccessToken(ctx),
+        refresh_token: await getAdsAccessToken(ctx),
       }, {
         onQueryError,
       });
@@ -95,7 +96,7 @@ export const googleRouter = createTRPCRouter({
       const queryUrl = 'analytics/v3/management/accounts'
       const searchParams = new URLSearchParams({
         // Access token authorizing the request
-        access_token: await getAccessToken(ctx)
+        access_token: await getAnalyticsAccessToken(ctx)
       })
       // Final URL for the request
       const url = new URL(`${queryUrl}?${searchParams.toString()}`, googleAnalyticsBaseURL)
@@ -118,7 +119,7 @@ export const googleRouter = createTRPCRouter({
       const queryUrl = `analytics/v3/management/accounts/${accountId}/webproperties`
       const searchParams = new URLSearchParams({
         // Access token authorizing the request
-        access_token: await getAccessToken(ctx)
+        access_token: await getAnalyticsAccessToken(ctx)
       })
       // Final URL for the request
       const url = new URL(`${queryUrl}?${searchParams.toString()}`, googleAnalyticsBaseURL)

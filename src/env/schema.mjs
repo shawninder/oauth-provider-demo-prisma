@@ -24,7 +24,6 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   GOOGLE_DEV_TOKEN: z.string(),
-  GOOGLE_AUTH_REDIRECT: z.string(),
   FACEBOOK_CLIENT_ID: z.string(),
   FACEBOOK_CLIENT_SECRET: z.string(),
 });
@@ -44,7 +43,6 @@ export const serverEnv = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GOOGLE_DEV_TOKEN: process.env.GOOGLE_DEV_TOKEN,
-  GOOGLE_AUTH_REDIRECT: process.env.GOOGLE_AUTH_REDIRECT,
   FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID,
   FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
 };

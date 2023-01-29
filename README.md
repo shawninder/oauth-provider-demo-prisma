@@ -28,7 +28,6 @@ You will need to add the following values to your environment variables via .env
   - GOOGLE_CLIENT_ID
   - GOOGLE_CLIENT_SECRET
   - GOOGLE_DEV_TOKEN (see https://developers.google.com/google-ads/api/docs/first-call/dev-token)
-  - GOOGLE_AUTH_REDIRECT (this should be http://localhost:3000/api/auth/callback/google when using an unmodified next-auth, as it is set it `.env.example`)
 
 Depending on which API endpoints you reach, you may need to add additional scopes in the provider settings in `[...nextauth].ts`
 

@@ -5,6 +5,9 @@ import FacebookProvider from "next-auth/providers/facebook";
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
+import GoogleAdsProvider from "../../../../providers/google-ads";
+import GoogleAnalyticsProvider from "../../../../providers/google-analytics";
+
 import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
 
@@ -83,6 +86,28 @@ export const authOptions: NextAuthOptions = {
       },
       allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
     }),
+    GoogleAdsProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: 'openid https://www.googleapis.com/auth/adwords',
+          access_type: 'offline'
+        }
+      },
+      allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
+    }),
+    GoogleAnalyticsProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          scope: 'openid https://www.googleapis.com/auth/analytics.readonly',
+          access_type: 'offline'
+        }
+      },
+      allowDangerousEmailAccountLinking: true // See https://next-auth.js.org/configuration/providers/oauth#allowdangerousemailaccountlinking-option
+    }),
     FacebookProvider({
       clientId: env.FACEBOOK_CLIENT_ID,
       clientSecret: env.FACEBOOK_CLIENT_SECRET,
@@ -98,6 +123,11 @@ export const authOptions: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  // Specify URLs to be used if you want to create custom sign in, sign out and error pages.
+  // See https://next-auth.js.org/configuration/options#pages
+  pages: {
+    signIn: '/auth/signIn',
+  }
 };
 
 export default NextAuth(authOptions);
